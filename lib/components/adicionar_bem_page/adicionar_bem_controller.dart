@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:inventario_getx/components/adicionar_bem_page/adicionar_bem_repository.dart';
 import 'package:inventario_getx/data/model/localidade.dart';
 import 'package:inventario_getx/services/util.service.dart';
+import 'package:inventario_getx/custom_widgets/visualizar_imagem_page.dart';
 
 class AdicionarBemController extends GetxController {
   Localidade localidade;
@@ -164,7 +165,10 @@ class AdicionarBemController extends GetxController {
     update();
   }
 
-  goToImagem() {}
+  goToImagem() {
+    if (imagem == null) return;
+    Get.to(() => VisualizarImagemPage(imagem));
+  }
 
   getImageTeste() async {
     File result = await utilService.getImage();

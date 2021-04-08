@@ -6,6 +6,7 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inventario_getx/components/bem_detail_page/bem_detail_repository.dart';
+import 'package:inventario_getx/custom_widgets/visualizar_imagem_page.dart';
 import 'package:inventario_getx/data/model/bem.dart';
 import 'package:inventario_getx/data/model/localidade.dart';
 import 'package:inventario_getx/services/util.service.dart';
@@ -195,7 +196,9 @@ class BemDetailController extends GetxController {
     update();
   }
 
-  goToImagem() {}
+  goToImagem() {
+    Get.to(() => VisualizarImagemPage(imagem != null ? imagem : bem.imagem));
+  }
 
   getImage() async {
     try {

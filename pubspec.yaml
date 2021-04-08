@@ -46,6 +46,8 @@ dependencies:
   camera_camera: ^2.0.1
   images_picker: ^1.0.0
   camerawesome: ^0.3.0-nullsafety
+  extended_image: ^4.0.0
+  flutter_image_compress: ^1.0.0
   
 dev_dependencies:
   flutter_test:

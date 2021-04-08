@@ -190,65 +190,68 @@ class LoginPage extends StatelessWidget {
               return Form(
                 key: controller.formKey,
                 child: SafeArea(
-                  child: Card(
-                    margin: EdgeInsets.only(top: 5, left: 15, right: 15),
-                    child: Container(
-                      padding: EdgeInsets.only(left: 30, right: 30),
-                      //padding: EdgeInsets.all(30),
-                      child: ListView(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(15),
-                          ),
-                          Container(
-                            child: Text(
-                              'INVENTÁRIO IFAL',
-                              style: TextStyle(
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
-                                  shadows: <Shadow>[
-                                    Shadow(
-                                      offset: Offset(1.0, 1.0),
-                                      blurRadius: 2.0,
-                                      color: Color.fromARGB(255, 0, 0, 0),
-                                    ),
-                                    Shadow(
-                                      offset: Offset(1, 1),
-                                      blurRadius: 1.0,
-                                      color: Color.fromARGB(125, 0, 0, 255),
-                                    ),
-                                  ],
-                                  color: Get.theme.primaryColor),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          Divider(),
-                          emailField(),
-                          if (controller.signUp)
+                  child: Center(
+                    child: Card(
+                      margin: EdgeInsets.only(top: 5, left: 15, right: 15),
+                      child: Container(
+                        padding: EdgeInsets.only(left: 30, right: 30),
+                        //padding: EdgeInsets.all(30),
+                        child: ListView(
+                          shrinkWrap: true,
+                          children: [
                             Container(
-                              margin: EdgeInsets.only(top: 10),
-                              child: nomeField(),
+                              padding: EdgeInsets.all(15),
                             ),
-                          if (controller.signUp)
                             Container(
-                              margin: EdgeInsets.only(top: 10),
-                              child: cpfField(),
+                              child: Text(
+                                'INVENTÁRIO IFAL',
+                                style: TextStyle(
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.bold,
+                                    shadows: <Shadow>[
+                                      Shadow(
+                                        offset: Offset(1.0, 1.0),
+                                        blurRadius: 2.0,
+                                        color: Color.fromARGB(255, 0, 0, 0),
+                                      ),
+                                      Shadow(
+                                        offset: Offset(1, 1),
+                                        blurRadius: 1.0,
+                                        color: Color.fromARGB(125, 0, 0, 255),
+                                      ),
+                                    ],
+                                    color: Get.theme.primaryColor),
+                                textAlign: TextAlign.center,
+                              ),
                             ),
-                          if (controller.signUp)
+                            Divider(),
+                            emailField(),
+                            if (controller.signUp)
+                              Container(
+                                margin: EdgeInsets.only(top: 10),
+                                child: nomeField(),
+                              ),
+                            if (controller.signUp)
+                              Container(
+                                margin: EdgeInsets.only(top: 10),
+                                child: cpfField(),
+                              ),
+                            if (controller.signUp)
+                              Container(
+                                margin: EdgeInsets.only(top: 10),
+                                child: siapeField(),
+                              ),
+                            if (controller.signUp) selectCampus(),
                             Container(
-                              margin: EdgeInsets.only(top: 10),
-                              child: siapeField(),
+                              margin: EdgeInsets.only(top: 10, bottom: 10),
+                              child: passwordField(),
                             ),
-                          if (controller.signUp) selectCampus(),
-                          Container(
-                            margin: EdgeInsets.only(top: 10, bottom: 10),
-                            child: passwordField(),
-                          ),
-                          if (controller.signUp) confirmPasswordField(),
-                          toggleSignUpButton(),
-                          submitButton(),
-                          Padding(padding: EdgeInsets.all(20))
-                        ],
+                            if (controller.signUp) confirmPasswordField(),
+                            toggleSignUpButton(),
+                            submitButton(),
+                            Padding(padding: EdgeInsets.all(20))
+                          ],
+                        ),
                       ),
                     ),
                   ),

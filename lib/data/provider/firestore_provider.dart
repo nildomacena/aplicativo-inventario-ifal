@@ -191,6 +191,7 @@ class FirestoreProvider {
     QuerySnapshot bensSnapshot =
         await _firestore.collection('${localidade.pathFirestore}/bens').get();
     await firebaseMessaging.subscribeToTopic(documentReference.id);
+    await imagem.delete();
     return Localidade.fromFirestore(localidadeSnapshot, localidade.campusId,
         snapshotBens: bensSnapshot);
   }

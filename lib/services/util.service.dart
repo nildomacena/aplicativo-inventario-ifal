@@ -7,6 +7,7 @@ import 'package:camerawesome/camerawesome_plugin.dart';
 import 'package:camerawesome/models/orientations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:inventario_getx/data/model/descricaoBem.dart';
@@ -128,12 +129,12 @@ class UtilService {
         ValueNotifier(CaptureModes.PHOTO);
 
     final String filePath =
-        '${extDir.path}/${DateTime.now().millisecondsSinceEpoch}.png';
+        '${extDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
     /* await _pictureController.takePicture(filePath);
     File imagem = File(filePath);
     print(imagem);
     return imagem; */
-    return Get.to(Scaffold(
+    File imageAux = await Get.to(Scaffold(
       body: Container(
         height: Get.height,
         width: Get.width,
@@ -143,8 +144,8 @@ class UtilService {
             CameraAwesome(
               testMode: false,
               onPermissionsResult: (bool result) {},
-              selectDefaultSize: (List<Size> availableSizes) =>
-                  Size(Get.height, Get.width),
+              /* selectDefaultSize: (List<Size> availableSizes) =>
+                  Size(Get.height, Get.width), */
               onCameraStarted: () {},
               onOrientationChanged: (CameraOrientations newOrientation) {},
               zoom: _zoomNotifier,
@@ -179,6 +180,16 @@ class UtilService {
         ),
       ),
     ));
+    if (imageAux == null) return imageAux;
+    File image = await FlutterImageCompress.compressAndGetFile(
+      imageAux.absolute.path,
+      '${extDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg',
+      minWidth: 1920,
+      minHeight: 1920,
+      quality: 70,
+    );
+    await imageAux.delete();
+    return image;
   }
 
   Future<File> getImageBkp() {
