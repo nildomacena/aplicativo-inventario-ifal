@@ -29,27 +29,9 @@ class LocalidadeDetailPage extends StatelessWidget {
           title: Text(controller.localidade.nome),
         ),
         body: GetX<LocalidadeDetailController>(builder: (_) {
-          if (_.bens.isEmpty) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Center(child: CircularProgressIndicator()),
-                Container(
-                    margin: EdgeInsets.only(top: 20),
-                    child: Text(
-                      'Carregando Dados...',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green,
-                          fontSize: 22),
-                    ))
-              ],
-            );
-          }
           return Container(
               child: ListView.builder(
-                  itemCount: _.bens.length,
+                  itemCount: _.bens.length + 2,
                   itemBuilder: (context, index) {
                     if (index == 0)
                       return CardDadosGerais(controller: controller);
@@ -66,8 +48,9 @@ class LocalidadeDetailPage extends StatelessWidget {
                         child: ListTile(
                           title: TextButton(
                             child: Text('${bem.descricao}',
+                                textAlign: TextAlign.center,
                                 style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.w400)),
+                                    fontSize: 18, fontWeight: FontWeight.w600)),
                             onPressed: () {
                               controller.goToBem(bem);
                             },

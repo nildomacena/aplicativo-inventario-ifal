@@ -1,10 +1,16 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:camera_camera/camera_camera.dart';
+import 'package:camerawesome/camerapreview.dart';
+import 'package:camerawesome/camerawesome_plugin.dart';
+import 'package:camerawesome/models/orientations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:inventario_getx/data/model/descricaoBem.dart';
+import 'package:path_provider/path_provider.dart';
 
 class UtilService {
   List<DescricaoBem> listaDescricao = [];
@@ -107,6 +113,85 @@ class UtilService {
 
   MaterialStateProperty<Color> colorButton(MaterialColor color) {
     return MaterialStateProperty.all<Color>(color);
+  }
+
+  Future<File> getImage() async {
+    PictureController _pictureController = new PictureController();
+    ValueNotifier<double> _zoomNotifier = ValueNotifier(0);
+    final Directory extDir = await getTemporaryDirectory();
+    ValueNotifier<CameraFlashes> _switchFlash =
+        ValueNotifier(CameraFlashes.AUTO);
+    ValueNotifier<Size> _photoSize = ValueNotifier(null);
+    ValueNotifier<Sensors> _sensor = ValueNotifier(Sensors.BACK);
+
+    ValueNotifier<CaptureModes> _captureMode =
+        ValueNotifier(CaptureModes.PHOTO);
+
+    final String filePath =
+        '${extDir.path}/${DateTime.now().millisecondsSinceEpoch}.png';
+    /* await _pictureController.takePicture(filePath);
+    File imagem = File(filePath);
+    print(imagem);
+    return imagem; */
+    return Get.to(Scaffold(
+      body: Container(
+        height: Get.height,
+        width: Get.width,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            CameraAwesome(
+              testMode: false,
+              onPermissionsResult: (bool result) {},
+              selectDefaultSize: (List<Size> availableSizes) =>
+                  Size(Get.height, Get.width),
+              onCameraStarted: () {},
+              onOrientationChanged: (CameraOrientations newOrientation) {},
+              zoom: _zoomNotifier,
+              sensor: _sensor,
+              photoSize: _photoSize,
+              switchFlashMode: _switchFlash,
+              captureMode: _captureMode,
+              //orientation: DeviceOrientation.portraitUp,
+              fitted: true,
+            ),
+            Positioned(
+                bottom: 20,
+                child: Container(
+                  alignment: Alignment.center,
+                  width: Get.width,
+                  child: IconButton(
+                    color: Colors.green,
+                    hoverColor: Colors.green,
+                    onPressed: () async {
+                      await _pictureController.takePicture(filePath);
+                      File imagem = File(filePath);
+                      Get.back(result: imagem);
+                    },
+                    icon: Icon(
+                      Icons.camera,
+                      size: 40,
+                      color: Colors.white,
+                    ),
+                  ),
+                ))
+          ],
+        ),
+      ),
+    ));
+  }
+
+  Future<File> getImageBkp() {
+    return Get.to(Scaffold(
+      body: SafeArea(
+        child: CameraCamera(
+            enableZoom: true,
+            resolutionPreset: ResolutionPreset.ultraHigh,
+            onFile: (file) {
+              Get.back(result: file);
+            }),
+      ),
+    ));
   }
 }
 

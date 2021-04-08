@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:inventario_getx/data/model/campus.dart';
 import 'package:inventario_getx/data/model/usuario.dart';
 import 'package:inventario_getx/data/provider/firestore_provider.dart';
 
@@ -32,18 +33,30 @@ class AuthProvider {
       @required String nome,
       @required String cpf,
       @required String siape,
+      @required Campus campus,
       @required String password}) async {
-    QuerySnapshot querySnapshot = await _firestore
+    QuerySnapshot querySnapshot;
+    /* querySnapshot = await _firestore
         .collection('usuarios')
         .where('email', isEqualTo: email)
         .get();
-    if (querySnapshot.docs.isNotEmpty) throw 'usuario-ja-cadastrado';
+    if (querySnapshot.docs.isNotEmpty) throw {code: 'usuario-ja-cadastrado'}; */
+
+    querySnapshot = await _firestore
+        .collection('${campus.firestorePath}/preCadastros')
+        .where('cpf', isEqualTo: cpf.replaceAll(new RegExp(r'[^\w\s]+'), ''))
+        .where('siape', isEqualTo: siape)
+        .get();
+    print(cpf.replaceAll(new RegExp(r'[^\w\s]+'), ''));
+    print(querySnapshot.docs.isEmpty);
+    if (querySnapshot.docs.isEmpty) throw 'pre-cadastro-inexistente';
     UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: email, password: password);
-    _firestore.collection('usuarios').add({
-      'campus': {'id': 'xQvvY7xXGWLIB4Eoj3HI', 'nome': 'Benedito Bentes'},
-      'campusId': 'xQvvY7xXGWLIB4Eoj3HI',
-      'campusNome': 'Benedito Bentes',
+    _firestore.doc('usuarios/${userCredential.user.uid}').set({
+      'idPreCadastro': querySnapshot.docs.first.id,
+      'campus': campus.asMap,
+      'campusId': campus.id,
+      'campusNome': campus.nome,
       'confirmado': true,
       'cpf': cpf,
       'dataPreCadastro': FieldValue.serverTimestamp(),
@@ -51,6 +64,11 @@ class AuthProvider {
       'papel': 'padrao',
       'siape': siape,
       'uid': userCredential.user.uid
+    });
+    await _firestore
+        .doc('${campus.firestorePath}/${querySnapshot.docs.first.id}')
+        .update({
+      'dataSignup': FieldValue.serverTimestamp(),
     });
     return getUserByUID(userCredential.user.uid);
   }

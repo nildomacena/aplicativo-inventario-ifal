@@ -43,7 +43,10 @@ dependencies:
   flutter_qr_reader: ^1.0.5
   flutter_masked_text: ^0.8.0
   flutter_barcode_scanner: ^2.0.0-nullsafety.0
-
+  camera_camera: ^2.0.1
+  images_picker: ^1.0.0
+  camerawesome: ^0.3.0-nullsafety
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:get/get.dart';
+import 'package:inventario_getx/components/login_page/custom_widgets/select_campus_modal.dart';
 import 'package:inventario_getx/components/login_page/login_repository.dart';
+import 'package:inventario_getx/data/model/campus.dart';
 import 'package:inventario_getx/data/model/localidade.dart';
 import 'package:inventario_getx/data/model/usuario.dart';
 import 'package:inventario_getx/routes/app_routes.dart';
@@ -11,6 +14,9 @@ import 'package:inventario_getx/services/util.service.dart';
 class LoginController extends GetxController {
   final LoginRepository repository;
   final formKey = GlobalKey<FormState>();
+  List<Campus> campi = [];
+  Campus campusSelecionado;
+  Campus campusEscolhido;
 
   TextEditingController emailController = TextEditingController();
   TextEditingController nomeController = TextEditingController();
@@ -36,9 +42,10 @@ class LoginController extends GetxController {
   get obj => this._obj.value;
 
   @override
-  void onInit() {
-    passwordController.text = 'q1w2e3';
-    emailController.text = 'ednildo.filho@ifal.edu.br';
+  void onInit() async {
+    /*  passwordController.text = 'q1w2e3';
+    emailController.text = 'ednildo.filho@ifal.edu.br'; */
+    campi = await repository.getCampi();
     super.onInit();
   }
 
@@ -120,6 +127,30 @@ class LoginController extends GetxController {
     salvando = value;
   }
 
+  openModalCampi() {
+    print('Campi: $campi');
+    Get.to(() => SelectCampusModal(Get.find()), fullscreenDialog: true);
+  }
+
+  onSelectCampus(Campus campus) {
+    if (campusSelecionado != null && campus.id.contains(campusSelecionado.id))
+      campusSelecionado = null;
+    else
+      campusSelecionado = campus;
+    print('campusSelecionado: $campusSelecionado');
+    update();
+  }
+
+  onDefineCampus() {
+    if (campusSelecionado == null) {
+      utilService.snackBarErro(mensagem: 'Escolha primeiro um  campus');
+      return;
+    }
+    campusEscolhido = campusSelecionado;
+    update();
+    Get.back();
+  }
+
   onSubmit() async {
     print('onSubmit: ${formKey.currentState.validate()}');
     if (formKey.currentState.validate()) {
@@ -130,13 +161,21 @@ class LoginController extends GetxController {
         if (!signUp)
           usuario = await repository.login(
               emailController.text, passwordController.text);
-        else
+        else {
+          if (campusEscolhido == null) {
+            utilService.snackBarErro(
+                mensagem: 'Seleciona um campus para realizar o cadastro');
+            return;
+          }
           usuario = await repository.createUser(
+              campus: campusEscolhido,
               email: emailController.text,
               nome: nomeController.text,
               cpf: cpfController.text,
               siape: siapeController.text,
               password: passwordController.text);
+        }
+        if (usuario == null) return;
         List<Localidade> localidades =
             await repository.getLocalidadesByUsuario(usuario);
 
@@ -149,7 +188,7 @@ class LoginController extends GetxController {
               mensagem:
                   'Não foram encontradas localidades para esse usuário.\nEntre em contato com os administradores');
         }
-      } on PlatformException catch (e) {
+      } on FirebaseAuthException catch (e) {
         if (Get.isDialogOpen) Get.back();
         if (e.code.contains('user-not-found')) {
           utilService.snackBarErro(mensagem: 'Usuário não encontrado');
@@ -161,20 +200,18 @@ class LoginController extends GetxController {
           utilService.snackBarErro(
               mensagem: 'Esse email já está sendo utilizado');
         }
+        if (e.code.contains('usuario-ja-cadastrado')) {
+          utilService.snackBarErro(
+              mensagem: 'Esse email já está sendo utilizado');
+        }
       } catch (e) {
         if (Get.isDialogOpen) Get.back();
-        if (e != null && e.code != null) {
-          if (e.code.contains('user-not-found')) {
-            utilService.snackBarErro(mensagem: 'Usuário não encontrado');
-          }
-          if (e.code.contains('email-already-in-use')) {
-            utilService.snackBarErro(
-                mensagem: 'Esse email já está sendo utilizado');
-          }
-          if (e.code.contains('wrong-password')) {
-            utilService.snackBarErro(mensagem: 'Senha incorreta');
-          }
-        }
+        if (e.runtimeType == String && e.contains('pre-cadastro-inexistente'))
+          utilService.snackBarErro(
+              mensagem:
+                  'Seu pré-cadastro não foi realizado.\nEntre em contato com a comissão do seu campus.');
+        else
+          utilService.snackBarErro(mensagem: 'Erro durante o login');
         print('erro ao fazer login $e');
       }
     }

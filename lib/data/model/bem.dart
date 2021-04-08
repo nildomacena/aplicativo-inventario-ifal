@@ -35,6 +35,10 @@ class Bem {
       this.dataCadastro,
       this.aCorrigir});
 
+  String get storagePath =>
+      'inventario2020/$campusId}/$localidadeId}/bens/$id}';
+  String get firestorePath =>
+      'campi/$campusId/2020/2020/localidades/$localidadeId/bens/$id';
   String get titulo {
     if (patrimonio.length > 0)
       return descricao + ' - ' + patrimonio;

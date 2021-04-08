@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:images_picker/images_picker.dart';
 import 'package:inventario_getx/components/fotos_panoramicas_page/fotos_panoramicas_repository.dart';
 import 'package:inventario_getx/data/model/localidade.dart';
 import 'package:inventario_getx/services/util.service.dart';
@@ -35,6 +36,20 @@ class FotosPanoramicasController extends GetxController {
   }
 
   getImage() async {
+    try {
+      List<Media> res = await ImagesPicker.openCamera(
+        pickType: PickType.image,
+      );
+      print('res: ${res.first.path}');
+      images.add({'type': File, 'file': File(res.first.path)});
+      update();
+    } catch (e) {
+      print('Erro durante a camptura da imagem: $e');
+      utilService.snackBarErro(mensagem: 'Erro durante a captura da imagem');
+    }
+  }
+
+  getImageBkp() async {
     try {
       final PickedFile pickedFile = await picker.getImage(
           source: ImageSource.camera,

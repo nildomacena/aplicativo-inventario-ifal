@@ -3,8 +3,24 @@ import 'package:get/get.dart';
 import 'package:inventario_getx/components/login_page/login_controller.dart';
 
 class LoginPage extends StatelessWidget {
-  TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 17);
-  LoginController controller = Get.find();
+  final TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 17);
+  final LoginController controller = Get.find();
+
+  Widget selectCampus() {
+    return Container(
+      height: 50,
+      margin: EdgeInsets.only(top: 10),
+      decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(32.0)),
+      child: TextButton(
+        child: Text(controller.campusEscolhido != null
+            ? 'Campus: ' + controller.campusEscolhido.nome.toUpperCase()
+            : 'SELECIONAR CAMPUS'),
+        onPressed: controller.openModalCampi,
+      ),
+    );
+  }
 
   Widget emailField() {
     return GetBuilder<LoginController>(builder: (_) {
@@ -33,7 +49,8 @@ class LoginPage extends StatelessWidget {
         style: style,
         controller: controller.passwordController,
         focusNode: controller.passwordFocus,
-        textInputAction: TextInputAction.send,
+        textInputAction:
+            controller.signUp ? TextInputAction.next : TextInputAction.send,
         keyboardType: TextInputType.visiblePassword,
         decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
@@ -77,7 +94,10 @@ class LoginPage extends StatelessWidget {
           minWidth: Get.width,
           padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
           disabledColor: Colors.grey[300],
-          onPressed: controller.salvando ? null : controller.onSubmit,
+          onPressed: controller.salvando ||
+                  (controller.signUp && controller.campusEscolhido == null)
+              ? null
+              : controller.onSubmit,
           child: Text(
               controller.salvando
                   ? 'Aguarde...'
@@ -219,13 +239,15 @@ class LoginPage extends StatelessWidget {
                               margin: EdgeInsets.only(top: 10),
                               child: siapeField(),
                             ),
+                          if (controller.signUp) selectCampus(),
                           Container(
                             margin: EdgeInsets.only(top: 10, bottom: 10),
                             child: passwordField(),
                           ),
                           if (controller.signUp) confirmPasswordField(),
                           toggleSignUpButton(),
-                          submitButton()
+                          submitButton(),
+                          Padding(padding: EdgeInsets.all(20))
                         ],
                       ),
                     ),

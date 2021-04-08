@@ -29,14 +29,16 @@ class RelatorioController extends GetxController {
 
   getImage() async {
     try {
-      final PickedFile pickedFile = await picker.getImage(
+      /*  final PickedFile pickedFile = await picker.getImage(
           source: ImageSource.camera,
           maxHeight: 1920,
           maxWidth: 1920,
           imageQuality: 70);
       if (pickedFile == null) return;
       imagem = File(pickedFile.path);
-      print('pickedFile: $pickedFile');
+      print('pickedFile: $pickedFile'); */
+      File onFile = await utilService.getImage();
+      if (onFile != null) imagem = onFile;
       update();
     } catch (e) {
       print('Erro: $e');

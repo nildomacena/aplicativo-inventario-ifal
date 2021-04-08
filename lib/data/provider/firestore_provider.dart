@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:inventario_getx/data/model/bem.dart';
+import 'package:inventario_getx/data/model/campus.dart';
 import 'package:inventario_getx/data/model/localidade.dart';
 import 'package:inventario_getx/data/model/usuario.dart';
 import 'package:inventario_getx/data/provider/auth_provider.dart';
@@ -17,6 +18,17 @@ class FirestoreProvider {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   FirebaseStorage storage = FirebaseStorage.instance;
   AuthProvider authProvider = Get.find();
+  List<Campus> campi = [];
+
+  Future<List<Campus>> getCampi() async {
+    if (campi.isNotEmpty) return campi;
+    campi = (await _firestore.collection('campi').orderBy('nome').get())
+        .docs
+        .map((c) => Campus.fromFirestore(c))
+        .toList();
+    return campi;
+  }
+
   Future<List<Localidade>> getLocalidadesPorUsuario(Usuario usuario) async {
     QuerySnapshot querySnapshot = await _firestore
         .collection('campi/${usuario.campusId}/2020/2020/localidades')
@@ -127,7 +139,7 @@ class FirestoreProvider {
 
   /**BENS */
   Future<Localidade> salvarBem(Localidade localidade,
-      {File imagem,
+      {@required File imagem,
       @required String descricao,
       @required String patrimonio,
       @required bool semEtiqueta,
@@ -181,5 +193,47 @@ class FirestoreProvider {
     await firebaseMessaging.subscribeToTopic(documentReference.id);
     return Localidade.fromFirestore(localidadeSnapshot, localidade.campusId,
         snapshotBens: bensSnapshot);
+  }
+
+  Future<dynamic> alterarBem(
+      {@required Bem bemAntigo,
+      @required String descricao,
+      @required String patrimonio,
+      @required bool semEtiqueta,
+      @required String numeroSerie,
+      @required String estadoBem,
+      @required bool bemParticular,
+      @required bool indicaDesfazimento,
+      @required String observacoes,
+      @required File imagem}) async {
+    if (imagem != null) {
+      TaskSnapshot taskSnapshot = await storage
+          .ref()
+          .child(bemAntigo.storagePath)
+          .putFile(imagem)
+          .whenComplete(() => null);
+      return _firestore.doc(bemAntigo.firestorePath).update({
+        'descricao': descricao,
+        'patrimonio': patrimonio,
+        'semEtiqueta': semEtiqueta,
+        'numeroSerie': numeroSerie,
+        'estadoBem': estadoBem,
+        'bemParticular': bemParticular,
+        'indicaDesfazimento': indicaDesfazimento,
+        'observacoes': observacoes,
+        'imagem': await taskSnapshot.ref.getDownloadURL()
+      });
+    } else {
+      return _firestore.doc(bemAntigo.firestorePath).update({
+        'descricao': descricao,
+        'patrimonio': patrimonio,
+        'semEtiqueta': semEtiqueta,
+        'numeroSerie': numeroSerie,
+        'estadoBem': estadoBem,
+        'bemParticular': bemParticular,
+        'indicaDesfazimento': indicaDesfazimento,
+        'observacoes': observacoes,
+      });
+    }
   }
 }

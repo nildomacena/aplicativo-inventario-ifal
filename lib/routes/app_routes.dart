@@ -5,4 +5,5 @@ abstract class Routes {
   static const FOTOS_PANORAMICAS = '/fotos_panoramicas';
   static const RELATORIO = '/relatorio';
   static const ADICIONAR_BEM = '/adicionar_bem';
+  static const BEM_DETAIL = '/bem_detail';
 }

@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:inventario_getx/components/adicionar_bem_page/adicionar_bem_binding.dart';
 import 'package:inventario_getx/components/adicionar_bem_page/adicionar_bem_page.dart';
+import 'package:inventario_getx/components/bem_detail_page/bem_detail_binding.dart';
+import 'package:inventario_getx/components/bem_detail_page/bem_detail_page.dart';
 import 'package:inventario_getx/components/fotos_panoramicas_page/fotos_panoramicas_binding.dart';
 import 'package:inventario_getx/components/fotos_panoramicas_page/fotos_panoramicas_page.dart';
 import 'package:inventario_getx/components/localidade_detail_page/localidade_detail_binding.dart';
@@ -37,5 +39,9 @@ class AppPages {
         name: Routes.ADICIONAR_BEM,
         page: () => AdicionarBemPage(),
         binding: AdicionarBemBinding()),
+    GetPage(
+        name: Routes.BEM_DETAIL,
+        page: () => BemDetailPage(),
+        binding: BemDetailBinding()),
   ];
 }

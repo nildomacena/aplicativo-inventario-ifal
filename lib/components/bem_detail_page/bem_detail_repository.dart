@@ -1,21 +1,19 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:inventario_getx/data/model/bem.dart';
 import 'package:inventario_getx/data/model/localidade.dart';
 import 'package:inventario_getx/data/provider/firestore_provider.dart';
 
-class AdicionarBemRepository {
+class BemDetailRepository {
   final FirestoreProvider firestoreProvider;
 
-  AdicionarBemRepository({@required this.firestoreProvider})
+  BemDetailRepository({@required this.firestoreProvider})
       : assert(firestoreProvider != null);
 
-  Future<Localidade> verificaBemJaCadastrado(String patrimonio) {
-    return firestoreProvider.verificaBemJaCadastrado(patrimonio);
-  }
-
-  Future<Localidade> salvarBem(Localidade localidade,
-      {@required File imagem,
+  Future alterarBem(
+      {@required Bem bemAntigo,
+      @required File imagem,
       @required String descricao,
       @required String patrimonio,
       @required bool semEtiqueta,
@@ -24,7 +22,8 @@ class AdicionarBemRepository {
       @required bool bemParticular,
       @required bool indicaDesfazimento,
       @required String observacoes}) {
-    return firestoreProvider.salvarBem(localidade,
+    return firestoreProvider.alterarBem(
+        bemAntigo: bemAntigo,
         imagem: imagem,
         descricao: descricao,
         patrimonio: patrimonio,

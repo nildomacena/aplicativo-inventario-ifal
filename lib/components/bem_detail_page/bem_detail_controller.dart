@@ -1,19 +1,22 @@
 import 'dart:io';
 
-import 'package:camera_camera/camera_camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:inventario_getx/components/adicionar_bem_page/adicionar_bem_repository.dart';
+import 'package:inventario_getx/components/bem_detail_page/bem_detail_repository.dart';
+import 'package:inventario_getx/data/model/bem.dart';
 import 'package:inventario_getx/data/model/localidade.dart';
 import 'package:inventario_getx/services/util.service.dart';
 
-class AdicionarBemController extends GetxController {
+class BemDetailController extends GetxController {
   Localidade localidade;
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final picker = ImagePicker();
+  String radioEstado;
+  File imagem;
+
   TextEditingController patrimonioController = TextEditingController();
   TextEditingController descricaoController = TextEditingController();
   TextEditingController numeroSerieController = TextEditingController();
@@ -30,14 +33,36 @@ class AdicionarBemController extends GetxController {
   bool salvando = false;
   bool alterar = false;
 
-  String radioEstado;
-
-  File imagem;
-
-  final AdicionarBemRepository repository;
-  AdicionarBemController({@required this.repository})
+  final BemDetailRepository repository;
+  Bem bem;
+  BemDetailController({@required this.repository})
       : assert(repository != null) {
+    bem = Get.arguments['bem'];
     localidade = Get.arguments['localidade'];
+    initForm();
+  }
+
+  bool get formValid =>
+      imagem != null ||
+      patrimonioController.text != bem.patrimonio ||
+      descricaoController.text != bem.descricao ||
+      numeroSerieController.text != bem.numeroSerie ||
+      observacoesController.text != bem.observacoes ||
+      bemParticular != bem.bemParticular ||
+      semEtiqueta != bem.semEtiqueta ||
+      indicaDesfazimento != bem.indicaDesfazimento ||
+      radioEstado != bem.estadoBem;
+
+  initForm() {
+    patrimonioController.text = bem.patrimonio;
+    descricaoController.text = bem.descricao;
+    numeroSerieController.text = bem.numeroSerie;
+    observacoesController.text = bem.observacoes;
+    bemParticular = bem.bemParticular;
+    semEtiqueta = bem.semEtiqueta;
+    indicaDesfazimento = bem.indicaDesfazimento;
+    radioEstado = bem.estadoBem;
+    //update();
   }
 
   unFocusAll() {
@@ -47,18 +72,19 @@ class AdicionarBemController extends GetxController {
     observacoesFocus.unfocus();
   }
 
-  /**PATRIMONIO */
+/**PATRIMONIO */
   onPatrimonioSubmit([String value]) {
     patrimonioFocus.unfocus();
     descricaoFocus.requestFocus();
+    update();
   }
 
   onPatrimonioComplete([String value]) async {
     descricaoController.text =
         utilService.getDescricaoPorTombamento(patrimonioController.text);
     print(descricaoController.text);
-    Localidade localidade =
-        await repository.verificaBemJaCadastrado(patrimonioController.text);
+    /* Localidade localidade =
+        await repository.verificaBemJaCadastrado(patrimonioController.text); */
     if (localidade != null) {
       Get.dialog(AlertDialog(
         title: Text('Bem Já inventariado'),
@@ -74,12 +100,14 @@ class AdicionarBemController extends GetxController {
         ],
       ));
     }
+    update();
   }
 
   String validatorPatrimonio([String value]) {
     if (value.isEmpty && !semEtiqueta && !bemParticular) {
       return "Digite o patrimônio do bem";
     }
+    update();
   }
 
   scanQrCode() async {
@@ -118,6 +146,7 @@ class AdicionarBemController extends GetxController {
   onDescricaoSubmit([String value]) {
     descricaoFocus.unfocus();
     numeroSerieFocus.requestFocus();
+    update();
   }
 
   String validatorDescricao([String value]) {
@@ -129,6 +158,7 @@ class AdicionarBemController extends GetxController {
   onNumeroSerieSubmit([String value]) {
     numeroSerieFocus.unfocus();
     observacoesFocus.requestFocus();
+    update();
   }
 
   String validatorNumeroSerie([String value]) {
@@ -140,6 +170,7 @@ class AdicionarBemController extends GetxController {
   onObservacoesSubmit([String value]) {
     numeroSerieFocus.unfocus();
     observacoesFocus.requestFocus();
+    update();
   }
 
   /**FIM OBSERVAÇÕES */
@@ -166,20 +197,9 @@ class AdicionarBemController extends GetxController {
 
   goToImagem() {}
 
-  getImageTeste() async {
-    File result = await utilService.getImage();
-    if (result != null) imagem = result;
-    update();
-  }
-
   getImage() async {
     try {
-      File onFile = await utilService.getImage();
-      if (onFile != null)
-        imagem = onFile;
-      else
-        return;
-      /*  final PickedFile pickedFile = await picker.getImage(
+      /* final PickedFile pickedFile = await picker.getImage(
           source: ImageSource.camera,
           maxHeight: 1920,
           maxWidth: 1920,
@@ -187,6 +207,11 @@ class AdicionarBemController extends GetxController {
       if (pickedFile == null) return;
       imagem = File(pickedFile.path);
       print('pickedFile: $pickedFile'); */
+      File onFile = await utilService.getImage();
+      if (onFile != null)
+        imagem = onFile;
+      else
+        return;
       update();
     } catch (e) {
       print('Erro: $e');
@@ -222,9 +247,17 @@ class AdicionarBemController extends GetxController {
     if (!formKey.currentState.validate()) {
       return;
     }
+    if (!formValid) {
+      Get.back();
+      utilService.snackBar(
+          titulo: 'Cadastro inalterado',
+          mensagem: 'O cadastro não foi alterado');
+      return;
+    }
     try {
       utilService.showAlertCarregando('Salvando cadastro do bem...');
-      Localidade teste = await repository.salvarBem(localidade,
+      await repository.alterarBem(
+          bemAntigo: bem,
           bemParticular: bemParticular,
           descricao: descricaoController.text,
           estadoBem: radioEstado,
@@ -236,7 +269,6 @@ class AdicionarBemController extends GetxController {
           semEtiqueta: semEtiqueta);
       if (Get.isDialogOpen) Get.back();
       Get.back();
-      print('teste: $teste');
       utilService.snackBar(
           titulo: 'Cadastro salvo!',
           mensagem: 'O bem ${descricaoController.text} foi salvo');

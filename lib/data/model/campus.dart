@@ -5,10 +5,15 @@ class Campus {
   final String nome;
 
   Campus({this.id, this.nome});
-  
+
+  String get firestorePath => 'campi/$id/2020/2020';
   @override
   String toString() {
     return 'Nome: $nome';
+  }
+
+  Map get asMap {
+    return {'nome': nome, 'id': id};
   }
 
   factory Campus.fromFirestore(DocumentSnapshot snapshot) {

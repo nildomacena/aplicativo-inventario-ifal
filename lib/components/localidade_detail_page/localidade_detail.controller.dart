@@ -37,6 +37,8 @@ class LocalidadeDetailController extends GetxController {
 
   goToBem(Bem bem) {
     print('Bem: $bem');
+    Get.toNamed(Routes.BEM_DETAIL,
+        arguments: {'bem': bem, 'localidade': localidade});
   }
 
   @override

@@ -2,12 +2,12 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:get/get.dart';
-import 'package:inventario_getx/components/adicionar_bem_page/adicionar_bem_controller.dart';
+import 'package:inventario_getx/components/bem_detail_page/bem_detail_controller.dart';
 import 'package:inventario_getx/services/util.service.dart';
 
-class AdicionarBemPage extends StatelessWidget {
-  AdicionarBemController controller = Get.find();
-  TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 19);
+class BemDetailPage extends StatelessWidget {
+  final BemDetailController controller = Get.find();
+  final TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 19);
 
   Widget patrimonioField() {
     return Container(
@@ -281,6 +281,7 @@ class AdicionarBemPage extends StatelessWidget {
   }
 
   Widget salvarButton() {
+    print('controller.formValid - ${controller.formValid}');
     return Container(
         //alignment: Alignment.center,
         margin: EdgeInsets.only(top: 20),
@@ -297,28 +298,50 @@ class AdicionarBemPage extends StatelessWidget {
                   color: Colors.white),
             ),
             onPressed:
-                controller.imagem == null || controller.radioEstado == null
-                    ? null
-                    : () {
-                        controller.onSubmit();
-                      }));
+                /* !controller.formValid
+                ? null
+                :  */
+                () {
+              controller.onSubmit();
+            }));
   }
 
   Widget rowFoto() {
+    print(controller.bem.imagem);
     return Container(
       height: 250,
       width: double.infinity,
       child: Column(
         children: <Widget>[
           Expanded(
-              child: controller.imagem != null
+            child: GestureDetector(
+                child: controller.imagem != null
+                    ? Image.file(
+                        controller.imagem,
+                        fit: BoxFit.cover,
+                      )
+                    : Image.network(
+                        controller.bem.imagem,
+                        fit: BoxFit.cover,
+                      ),
+                onTap: () {
+                  controller.goToImagem();
+                }),
+          ),
+          /* Expanded(
+              child: controller.imagem != null && controller.bem.imagem != null
                   ? GestureDetector(
                       child: Hero(
                         tag: controller.imagem.path,
-                        child: Image.file(
-                          controller.imagem,
-                          fit: BoxFit.cover,
-                        ),
+                        child: controller.imagem != null
+                            ? Image.file(
+                                controller.imagem,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.network(
+                                controller.bem.imagem,
+                                fit: BoxFit.cover,
+                              ),
                       ),
                       onTap: () {
                         controller.goToImagem();
@@ -327,12 +350,12 @@ class AdicionarBemPage extends StatelessWidget {
                       child: Center(
                         child: ElevatedButton.icon(
                             onPressed: () {
-                              controller.getImageTeste();
+                              controller.getImage();
                             },
                             icon: Icon(Icons.photo),
                             label: Text('Adicionar Imagem')),
                       ),
-                    )),
+                    )), */
           Divider(),
           if (controller.imagem != null)
             ElevatedButton.icon(
@@ -349,6 +372,22 @@ class AdicionarBemPage extends StatelessWidget {
               ),
               style: ButtonStyle(
                   backgroundColor: utilService.colorButton(Colors.red)),
+            ),
+          if (controller.imagem == null)
+            ElevatedButton.icon(
+              onPressed: () {
+                controller.getImage();
+              },
+              icon: Icon(
+                Icons.photo,
+                color: Colors.white,
+              ),
+              label: Text(
+                'Alterar Imagem',
+                style: TextStyle(color: Colors.white),
+              ),
+              style: ButtonStyle(
+                  backgroundColor: utilService.colorButton(Colors.green)),
             )
         ],
       ),
@@ -362,8 +401,9 @@ class AdicionarBemPage extends StatelessWidget {
         title: Text('Adicionar Bem'),
       ),
       body: Container(
-        child: GetBuilder<AdicionarBemController>(
+        child: GetBuilder<BemDetailController>(
           builder: (_) {
+            print('Bem: ${controller.bem.imagem}');
             return Container(
               //padding: EdgeInsets.only(top: 10),
               child: Form(
