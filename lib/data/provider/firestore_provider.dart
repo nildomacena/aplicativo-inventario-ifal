@@ -67,6 +67,7 @@ class FirestoreProvider {
 
   Future<dynamic> salvarImagensPanoramicas(
       Localidade localidade, List<File> imagens) async {
+    List<Future> salvandoImagens = [];
     TaskSnapshot taskSnapshot = await storage
         .ref()
         .child(
@@ -77,6 +78,32 @@ class FirestoreProvider {
         .doc(
             'campi/${authProvider.usuario.campusId}/2020/2020/localidades/${localidade.id}')
         .update({'panoramica': await taskSnapshot.ref.getDownloadURL()});
+  }
+
+  Future<dynamic> salvarMultiplasImagensPanoramicas(
+      Localidade localidade, List<File> imagens) async {
+    List<Future> salvandoImagens = [];
+    List<String> urlImagens = [];
+    salvandoImagens = imagens
+        .map((imagem) => storage
+            .ref()
+            .child(
+                'inventario2020/${localidade.campusId}/${localidade.id}/fotos-panoramicas${utilService.getFileName(imagem)}')
+            .putFile(imagem)
+            .then((value) async =>
+                urlImagens.add(await value.ref.getDownloadURL())))
+        .toList();
+    Future.wait(salvandoImagens);
+    /* TaskSnapshot taskSnapshot = await storage
+        .ref()
+        .child(
+            'inventario2020/${localidade.campusId}/${localidade.id}/fotos-panoramicas')
+        .putFile(imagens[0])
+        .whenComplete(() => null); */
+    return _firestore
+        .doc(
+            'campi/${authProvider.usuario.campusId}/2020/2020/localidades/${localidade.id}')
+        .update({'panoramicas': urlImagens});
   }
 
   Future<Localidade> getLocalidadeAtualizada(Localidade localidade) async {

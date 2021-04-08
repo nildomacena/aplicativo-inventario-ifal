@@ -54,10 +54,7 @@ class AdicionarBemController extends GetxController {
     descricaoFocus.requestFocus();
   }
 
-  onPatrimonioComplete([String value]) async {
-    descricaoController.text =
-        utilService.getDescricaoPorTombamento(patrimonioController.text);
-    print(descricaoController.text);
+  checkPatrimonio() async {
     Localidade localidade =
         await repository.verificaBemJaCadastrado(patrimonioController.text);
     if (localidade != null) {
@@ -77,6 +74,13 @@ class AdicionarBemController extends GetxController {
     }
   }
 
+  onPatrimonioComplete([String value]) async {
+    descricaoController.text =
+        utilService.getDescricaoPorTombamento(patrimonioController.text);
+    print(descricaoController.text);
+    checkPatrimonio();
+  }
+
   String validatorPatrimonio([String value]) {
     if (value.isEmpty && !semEtiqueta && !bemParticular) {
       return "Digite o patrimônio do bem";
@@ -93,6 +97,7 @@ class AdicionarBemController extends GetxController {
         descricaoController.text =
             utilService.getDescricaoPorTombamento(qrCodePatrimonio);
         patrimonioController.text = qrCodePatrimonio;
+        checkPatrimonio();
         update();
       }
     } catch (e) {

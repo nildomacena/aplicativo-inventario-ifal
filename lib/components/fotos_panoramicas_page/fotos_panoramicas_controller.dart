@@ -31,7 +31,8 @@ class FotosPanoramicasController extends GetxController {
   }
 
   initImages() {
-    images.add({'type': String, 'file': localidade.panoramica});
+    if (localidade.panoramica != null)
+      images.add({'type': String, 'file': localidade.panoramica});
     update();
   }
 

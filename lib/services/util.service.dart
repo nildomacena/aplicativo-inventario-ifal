@@ -184,9 +184,9 @@ class UtilService {
     File image = await FlutterImageCompress.compressAndGetFile(
       imageAux.absolute.path,
       '${extDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg',
-      minWidth: 1920,
-      minHeight: 1920,
-      quality: 70,
+      minWidth: 1080,
+      minHeight: 1080,
+      quality: 50,
     );
     await imageAux.delete();
     return image;
@@ -203,6 +203,13 @@ class UtilService {
             }),
       ),
     ));
+  }
+
+  String getFileName(File file) {
+    var completePath = file.path;
+    var fileName = (completePath.split('/').last);
+    var filePath = completePath.replaceAll("/$fileName", '');
+    return fileName;
   }
 }
 
