@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:images_picker/images_picker.dart';
 import 'package:inventario_getx/components/fotos_panoramicas_page/fotos_panoramicas_repository.dart';
+import 'package:inventario_getx/custom_widgets/visualizar_imagem_page.dart';
 import 'package:inventario_getx/data/model/localidade.dart';
 import 'package:inventario_getx/services/util.service.dart';
 
@@ -31,8 +32,12 @@ class FotosPanoramicasController extends GetxController {
   }
 
   initImages() {
-    if (localidade.panoramica != null)
-      images.add({'type': String, 'file': localidade.panoramica});
+    images = [];
+    if (localidade.panoramicas != null && localidade.panoramicas.isNotEmpty)
+      localidade.panoramicas.forEach((p) {
+        images.add({'type': String, 'file': p});
+      });
+    //images.add({'type': String, 'file': localidade.panoramica});
     update();
   }
 
@@ -43,6 +48,8 @@ class FotosPanoramicasController extends GetxController {
       );
       print('res: ${res.first.path}');
       images.add({'type': File, 'file': File(res.first.path)});
+      imagesFile.add(File(res.first.path));
+
       update();
     } catch (e) {
       print('Erro durante a camptura da imagem: $e');
@@ -68,11 +75,76 @@ class FotosPanoramicasController extends GetxController {
     }
   }
 
+  goToImagem(imagem) {
+    if (imagem == null) return;
+    Get.to(() => VisualizarImagemPage(imagem));
+  }
+
+  deleteImage(dynamic imagem) async {
+    int index = 0;
+    int indexAchou;
+
+    if (imagem['type'] == File) {
+      //print(imagesFile.indexOf(imagem));
+      images.forEach((i) {
+        if (i['type'] == File && i['file'].path.contains(imagem['file'].path)) {
+          indexAchou = index;
+        }
+        index++;
+      });
+      images.removeAt(indexAchou);
+      index = 0;
+      imagesFile.forEach((i) {
+        if (i.path.contains(imagem['file'].path)) {
+          indexAchou = index;
+        }
+        index++;
+      });
+      imagesFile.removeAt(indexAchou);
+    } else {
+      print('imagem[type].runtimeType == String');
+      var result = await Get.dialog(AlertDialog(
+        title: Text('Confirmação'),
+        content:
+            Text('Essa imagem está salva na nuvem. Deseja realmente excluir?'),
+        actions: [
+          TextButton(
+              onPressed: () {
+                Get.back(result: false);
+              },
+              child: Text('CANCELAR')),
+          TextButton(
+              onPressed: () {
+                Get.back(result: true);
+              },
+              child: Text('CONFIRMAR'))
+        ],
+      ));
+      if (result == null || !result) return;
+      try {
+        print('result: ${imagem.toString()}');
+        utilService.showAlertCarregando('Deletando imagem...');
+        localidade = await repository.deletarImagemPanoramica(
+            localidade, imagem['file']);
+        print('localidade panoramicas: ${localidade.panoramicas}');
+
+        initImages();
+        if (Get.isDialogOpen) Get.back();
+      } catch (e) {
+        print('Erro: $e');
+        if (Get.isDialogOpen) Get.back();
+        utilService.snackBarErro(mensagem: 'Erro durante a operação');
+      }
+    }
+  }
+
   onSubmit() async {
     print('onSubmit()');
     try {
       utilService.showAlertCarregando('Salvando imagens');
-      await repository.salvarImagensPanoramicas(localidade, imagesFile);
+      //await repository.salvarImagensPanoramicas(localidade, imagesFile);
+      await repository.salvarMultiplasImagensPanoramicas(
+          localidade, imagesFile);
       if (Get.isDialogOpen) Get.back();
       Get.back();
       utilService.snackBar(

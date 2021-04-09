@@ -8,8 +8,8 @@ class Localidade {
   final String id;
   final String campusId;
   Status status;
-  String
-      panoramica; //Alterar para array quando o mesmo estiver sendo salvo no banco de dados
+  List<dynamic>
+      panoramicas; //Alterar para array quando o mesmo estiver sendo salvo no banco de dados
   List<Bem> bens;
   String imagemRelatorio;
   String observacoes;
@@ -17,7 +17,7 @@ class Localidade {
       {this.nome,
       this.id,
       this.campusId,
-      this.panoramica,
+      this.panoramicas,
       this.bens,
       this.status,
       this.imagemRelatorio,
@@ -47,7 +47,7 @@ class Localidade {
     }
     return Localidade(
         nome: data['nome'],
-        panoramica: data['panoramica'],
+        panoramicas: data['panoramicas'] ?? [],
         imagemRelatorio: data['imagemRelatorio'] ?? '',
         observacoes: data['observacoes'] ?? '',
         status: status != null
@@ -80,7 +80,7 @@ class Localidade {
     }
     return Localidade(
         nome: data['nome'],
-        panoramica: data['panoramica'],
+        panoramicas: data['panoramicas'] ?? [],
         status: status != null
             ? status
             : data['status'] == 2

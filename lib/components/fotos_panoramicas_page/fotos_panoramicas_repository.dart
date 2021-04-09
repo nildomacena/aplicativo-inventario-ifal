@@ -18,4 +18,15 @@ class FotosPanoramicasRepository {
       Localidade localidade, List<File> imagens) async {
     return firestoreProvider.salvarImagensPanoramicas(localidade, imagens);
   }
+
+  Future<dynamic> salvarMultiplasImagensPanoramicas(
+      Localidade localidade, List<File> imagens) async {
+    return firestoreProvider.salvarMultiplasImagensPanoramicas(
+        localidade, imagens);
+  }
+
+  Future<Localidade> deletarImagemPanoramica(
+      Localidade localidade, String imagem) {
+    return firestoreProvider.deletarImagemPanoramica(localidade, imagem);
+  }
 }

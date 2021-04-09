@@ -88,22 +88,33 @@ class FirestoreProvider {
         .map((imagem) => storage
             .ref()
             .child(
-                'inventario2020/${localidade.campusId}/${localidade.id}/fotos-panoramicas${utilService.getFileName(imagem)}')
+                'inventario2020/${localidade.campusId}/${localidade.id}/fotos-panoramicas/${utilService.getFileName(imagem)}')
             .putFile(imagem)
             .then((value) async =>
                 urlImagens.add(await value.ref.getDownloadURL())))
         .toList();
-    Future.wait(salvandoImagens);
+    await Future.wait(salvandoImagens);
     /* TaskSnapshot taskSnapshot = await storage
         .ref()
         .child(
             'inventario2020/${localidade.campusId}/${localidade.id}/fotos-panoramicas')
         .putFile(imagens[0])
         .whenComplete(() => null); */
+    localidade.panoramicas.forEach((p) {
+      urlImagens.add(p);
+    });
     return _firestore
         .doc(
             'campi/${authProvider.usuario.campusId}/2020/2020/localidades/${localidade.id}')
         .update({'panoramicas': urlImagens});
+  }
+
+  Future<Localidade> deletarImagemPanoramica(
+      Localidade localidade, String imagem) async {
+    List<String> aux = [...localidade.panoramicas];
+    aux.removeWhere((i) => i.contains(imagem));
+    await _firestore.doc(localidade.pathFirestore).update({'panoramicas': aux});
+    return getLocalidadeAtualizada(localidade);
   }
 
   Future<Localidade> getLocalidadeAtualizada(Localidade localidade) async {

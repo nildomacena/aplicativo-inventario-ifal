@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
@@ -15,14 +16,24 @@ class FotosPanoramicasPage extends StatelessWidget {
         fit: StackFit.expand,
         children: <Widget>[
           if (imagem['type'] == File)
-            Image.file(
-              imagem['file'],
-              fit: BoxFit.cover,
+            GestureDetector(
+              onTap: () {
+                controller.goToImagem(imagem['file']);
+              },
+              child: ExtendedImage.file(
+                imagem['file'],
+                fit: BoxFit.cover,
+              ),
             ),
           if (imagem['type'] == String)
-            Image.network(
-              imagem['file'],
-              fit: BoxFit.cover,
+            GestureDetector(
+              onTap: () {
+                controller.goToImagem(imagem['file']);
+              },
+              child: ExtendedImage.network(
+                imagem['file'],
+                fit: BoxFit.cover,
+              ),
             ),
           Positioned(
             top: 5,
@@ -33,7 +44,9 @@ class FotosPanoramicasPage extends StatelessWidget {
                   size: 30,
                   color: Colors.redAccent,
                 ),
-                onPressed: controller.getImage),
+                onPressed: () {
+                  controller.deleteImage(imagem);
+                }),
           )
         ],
       ),
