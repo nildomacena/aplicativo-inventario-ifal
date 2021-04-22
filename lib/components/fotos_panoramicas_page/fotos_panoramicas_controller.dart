@@ -43,14 +43,16 @@ class FotosPanoramicasController extends GetxController {
 
   getImage() async {
     try {
-      List<Media> res = await ImagesPicker.openCamera(
+      File image = await utilService.getImage();
+      /* List<Media> res = await ImagesPicker.openCamera(
         pickType: PickType.image,
       );
-      print('res: ${res.first.path}');
-      images.add({'type': File, 'file': File(res.first.path)});
-      imagesFile.add(File(res.first.path));
-
-      update();
+      print('res: ${res.first.path}'); */
+      if (image != null) {
+        images.add({'type': File, 'file': image});
+        imagesFile.add(image);
+        update();
+      }
     } catch (e) {
       print('Erro durante a camptura da imagem: $e');
       utilService.snackBarErro(mensagem: 'Erro durante a captura da imagem');

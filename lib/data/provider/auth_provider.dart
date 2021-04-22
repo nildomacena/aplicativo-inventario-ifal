@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:inventario_getx/data/model/campus.dart';
 import 'package:inventario_getx/data/model/usuario.dart';
 import 'package:inventario_getx/data/provider/firestore_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -19,10 +20,17 @@ class AuthProvider {
     });
   }
 
+  Future<String> getUltimoEmail() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('email') ?? '';
+  }
+
   Future<Usuario> login(
       {@required String email, @required String password}) async {
     UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email, password: password);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('email', email);
     return getUserByUID(userCredential.user.uid);
   }
 
@@ -52,8 +60,10 @@ class AuthProvider {
     if (querySnapshot.docs.isEmpty) throw 'pre-cadastro-inexistente';
     UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: email, password: password);
-    _firestore.doc('usuarios/${userCredential.user.uid}').set({
+    await _firestore.doc('usuarios/${userCredential.user.uid}').set({
       'idPreCadastro': querySnapshot.docs.first.id,
+      'nome': nome,
+      'email': email,
       'campus': campus.asMap,
       'campusId': campus.id,
       'campusNome': campus.nome,
@@ -66,7 +76,8 @@ class AuthProvider {
       'uid': userCredential.user.uid
     });
     await _firestore
-        .doc('${campus.firestorePath}/${querySnapshot.docs.first.id}')
+        .doc(
+            '${campus.firestorePath}/preCadastros/${querySnapshot.docs.first.id}')
         .update({
       'dataSignup': FieldValue.serverTimestamp(),
     });

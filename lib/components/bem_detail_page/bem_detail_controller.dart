@@ -8,15 +8,20 @@ import 'package:image_picker/image_picker.dart';
 import 'package:inventario_getx/components/bem_detail_page/bem_detail_repository.dart';
 import 'package:inventario_getx/custom_widgets/visualizar_imagem_page.dart';
 import 'package:inventario_getx/data/model/bem.dart';
+import 'package:inventario_getx/data/model/correcao.dart';
 import 'package:inventario_getx/data/model/localidade.dart';
 import 'package:inventario_getx/services/util.service.dart';
 
 class BemDetailController extends GetxController {
   Localidade localidade;
+  Bem bem;
+  Correcao correcao;
+
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final picker = ImagePicker();
   String radioEstado;
   File imagem;
+  bool exibirCorrecao = true;
 
   TextEditingController patrimonioController = TextEditingController();
   TextEditingController descricaoController = TextEditingController();
@@ -35,11 +40,11 @@ class BemDetailController extends GetxController {
   bool alterar = false;
 
   final BemDetailRepository repository;
-  Bem bem;
   BemDetailController({@required this.repository})
       : assert(repository != null) {
     bem = Get.arguments['bem'];
     localidade = Get.arguments['localidade'];
+    correcao = Get.arguments['correcao'];
     initForm();
   }
 
@@ -86,7 +91,7 @@ class BemDetailController extends GetxController {
     print(descricaoController.text);
     /* Localidade localidade =
         await repository.verificaBemJaCadastrado(patrimonioController.text); */
-    if (localidade != null) {
+    /* if (localidade != null) {
       Get.dialog(AlertDialog(
         title: Text('Bem Já inventariado'),
         content: Text(
@@ -100,7 +105,7 @@ class BemDetailController extends GetxController {
           )
         ],
       ));
-    }
+    } */
     update();
   }
 
@@ -108,6 +113,11 @@ class BemDetailController extends GetxController {
     if (value.isEmpty && !semEtiqueta && !bemParticular) {
       return "Digite o patrimônio do bem";
     }
+    update();
+  }
+
+  toggleExibirCorrecao() {
+    exibirCorrecao = false;
     update();
   }
 
@@ -148,6 +158,43 @@ class BemDetailController extends GetxController {
     descricaoFocus.unfocus();
     numeroSerieFocus.requestFocus();
     update();
+  }
+
+  deletarBem(Bem bem) async {
+    var result = await Get.dialog(
+      AlertDialog(
+        title: Text('Excluir Bem'),
+        content: Text(
+            'Deseja realmente excluir o bem ${bem.descricao}?\nATENÇÃO: Essa operação não pode ser desfeita!'),
+        actions: [
+          TextButton(
+              onPressed: () {
+                Get.back(result: false);
+              },
+              child: Text('CANCELAR')),
+          TextButton(
+              onPressed: () {
+                Get.back(result: true);
+              },
+              child: Text('EXCLUIR BEM')),
+        ],
+      ),
+    );
+    if (result == null || !result) {
+      return;
+    }
+    utilService.showAlertCarregando('Aguarde...');
+    try {
+      await repository.deletarBem(bem);
+      if (Get.isDialogOpen) Get.back();
+      Get.back();
+      utilService.snackBar(
+          titulo: 'Bem excluído',
+          mensagem: 'O bem ${bem.descricao} foi excluído ');
+    } catch (e) {
+      if (Get.isDialogOpen) Get.back();
+      utilService.snackBarErro();
+    }
   }
 
   String validatorDescricao([String value]) {
@@ -269,7 +316,8 @@ class BemDetailController extends GetxController {
           numeroSerie: numeroSerieController.text,
           observacoes: observacoesController.text,
           patrimonio: patrimonioController.text,
-          semEtiqueta: semEtiqueta);
+          semEtiqueta: semEtiqueta,
+          correcao: correcao);
       if (Get.isDialogOpen) Get.back();
       Get.back();
       utilService.snackBar(

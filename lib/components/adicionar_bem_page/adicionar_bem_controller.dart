@@ -54,9 +54,9 @@ class AdicionarBemController extends GetxController {
     descricaoFocus.requestFocus();
   }
 
-  checkPatrimonio() async {
-    Localidade localidade =
-        await repository.verificaBemJaCadastrado(patrimonioController.text);
+  checkPatrimonio([String patrimonio]) async {
+    Localidade localidade = await repository
+        .verificaBemJaCadastrado(patrimonio ?? patrimonioController.text);
     if (localidade != null) {
       Get.dialog(AlertDialog(
         title: Text('Bem Já inventariado'),
@@ -97,7 +97,7 @@ class AdicionarBemController extends GetxController {
         descricaoController.text =
             utilService.getDescricaoPorTombamento(qrCodePatrimonio);
         patrimonioController.text = qrCodePatrimonio;
-        checkPatrimonio();
+        checkPatrimonio(qrCodePatrimonio);
         update();
       }
     } catch (e) {

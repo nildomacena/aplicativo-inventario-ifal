@@ -33,7 +33,7 @@ class AdicionarBemPage extends StatelessWidget {
                 decoration: InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                     hintText: controller.bemParticular
-                        ? 'Bem bemParticular'
+                        ? 'Bem Particular'
                         : "Patrimônio do bem",
                     hintStyle: TextStyle(
                         color: Colors.grey[400], fontWeight: FontWeight.w400),
@@ -242,7 +242,7 @@ class AdicionarBemPage extends StatelessWidget {
                 controller.onChangeBemParticular(!controller.bemParticular);
               },
               child: Text(
-                'Bem bemParticular?',
+                'Bem Particular?',
                 style: TextStyle(fontSize: 16),
               ),
             ),

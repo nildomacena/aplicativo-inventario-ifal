@@ -184,9 +184,7 @@ class UtilService {
     File image = await FlutterImageCompress.compressAndGetFile(
       imageAux.absolute.path,
       '${extDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg',
-      minWidth: 1080,
-      minHeight: 1080,
-      quality: 50,
+      quality: 30,
     );
     await imageAux.delete();
     return image;
@@ -210,6 +208,10 @@ class UtilService {
     var fileName = (completePath.split('/').last);
     var filePath = completePath.replaceAll("/$fileName", '');
     return fileName;
+  }
+
+  void fecharAlert() {
+    if (Get.isDialogOpen) Get.back();
   }
 }
 

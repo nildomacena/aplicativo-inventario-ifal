@@ -17,6 +17,7 @@ class LoginController extends GetxController {
   List<Campus> campi = [];
   Campus campusSelecionado;
   Campus campusEscolhido;
+  String ultimoEmail;
 
   TextEditingController emailController = TextEditingController();
   TextEditingController nomeController = TextEditingController();
@@ -46,7 +47,14 @@ class LoginController extends GetxController {
     /*  passwordController.text = 'q1w2e3';
     emailController.text = 'ednildo.filho@ifal.edu.br'; */
     campi = await repository.getCampi();
+    getUltimoEmail();
     super.onInit();
+  }
+
+  getUltimoEmail() async {
+    ultimoEmail = await repository.getUltimoEmail();
+    emailController.text = ultimoEmail;
+    update();
   }
 
   void onEmailSubmit([String email]) {

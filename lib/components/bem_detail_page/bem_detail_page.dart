@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:get/get.dart';
@@ -33,7 +34,7 @@ class BemDetailPage extends StatelessWidget {
                 decoration: InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                     hintText: controller.bemParticular
-                        ? 'Bem bemParticular'
+                        ? 'Bem Particular'
                         : "Patrimônio do bem",
                     hintStyle: TextStyle(
                         color: Colors.grey[400], fontWeight: FontWeight.w400),
@@ -242,7 +243,7 @@ class BemDetailPage extends StatelessWidget {
                 controller.onChangeBemParticular(!controller.bemParticular);
               },
               child: Text(
-                'Bem bemParticular?',
+                'Bem Particular?',
                 style: TextStyle(fontSize: 16),
               ),
             ),
@@ -306,6 +307,53 @@ class BemDetailPage extends StatelessWidget {
             }));
   }
 
+  Widget cardCorrecao() {
+    return Container(
+      width: Get.width,
+      height: 60,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18.0),
+              ),
+              elevation: 5,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.red[200],
+                ),
+                width: Get.width,
+                height: 100,
+                child: Container(
+                  margin: EdgeInsets.only(top: 10, left: 10, right: 15),
+                  child: AutoSizeText(
+                    'Correção solicitada: ${controller.correcao.motivo}',
+                    maxLines: 2,
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+              )),
+          Positioned(
+            top: -5,
+            right: 0,
+            child: IconButton(
+              splashColor: Colors.grey,
+              icon: Icon(Icons.close),
+              color: Colors.black,
+              onPressed: () {
+                print('close');
+                controller.toggleExibirCorrecao();
+              },
+              iconSize: 15,
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   Widget rowFoto() {
     print(controller.bem.imagem);
     return Container(
@@ -320,7 +368,7 @@ class BemDetailPage extends StatelessWidget {
                         controller.imagem,
                         fit: BoxFit.cover,
                       )
-                    : Image.network(
+                    : ExtendedImage.network(
                         controller.bem.imagem,
                         fit: BoxFit.cover,
                       ),
@@ -399,6 +447,16 @@ class BemDetailPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Adicionar Bem'),
+        actions: [
+          IconButton(
+              icon: Icon(
+                Icons.delete,
+                color: Colors.red,
+              ),
+              onPressed: () {
+                controller.deletarBem(controller.bem);
+              })
+        ],
       ),
       body: Container(
         child: GetBuilder<BemDetailController>(
@@ -411,6 +469,9 @@ class BemDetailPage extends StatelessWidget {
                 child: ListView(
                   children: <Widget>[
                     rowFoto(),
+                    if (controller.correcao != null &&
+                        controller.exibirCorrecao)
+                      cardCorrecao(),
                     patrimonioField(),
                     descricaoField(),
                     numeroSerieField(),

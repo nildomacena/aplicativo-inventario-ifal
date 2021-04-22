@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:inventario_getx/data/model/bem.dart';
+import 'package:inventario_getx/data/model/correcao.dart';
 import 'package:inventario_getx/data/model/localidade.dart';
 import 'package:inventario_getx/data/provider/firestore_provider.dart';
 
@@ -21,7 +22,8 @@ class BemDetailRepository {
       @required String estadoBem,
       @required bool bemParticular,
       @required bool indicaDesfazimento,
-      @required String observacoes}) {
+      @required String observacoes,
+      Correcao correcao}) {
     return firestoreProvider.alterarBem(
         bemAntigo: bemAntigo,
         imagem: imagem,
@@ -32,6 +34,11 @@ class BemDetailRepository {
         estadoBem: estadoBem,
         bemParticular: bemParticular,
         indicaDesfazimento: indicaDesfazimento,
-        observacoes: observacoes ?? '');
+        observacoes: observacoes ?? '',
+        correcao: correcao);
+  }
+
+  Future deletarBem(Bem bem) {
+    return firestoreProvider.deletarBem(bem);
   }
 }

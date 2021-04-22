@@ -224,32 +224,45 @@ class LoginPage extends StatelessWidget {
                                 textAlign: TextAlign.center,
                               ),
                             ),
-                            Divider(),
-                            emailField(),
-                            if (controller.signUp)
+                            if (controller.ultimoEmail == null)
                               Container(
-                                margin: EdgeInsets.only(top: 10),
-                                child: nomeField(),
+                                padding: EdgeInsets.only(top: 100, bottom: 100),
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
                               ),
-                            if (controller.signUp)
-                              Container(
-                                margin: EdgeInsets.only(top: 10),
-                                child: cpfField(),
-                              ),
-                            if (controller.signUp)
-                              Container(
-                                margin: EdgeInsets.only(top: 10),
-                                child: siapeField(),
-                              ),
-                            if (controller.signUp) selectCampus(),
-                            Container(
-                              margin: EdgeInsets.only(top: 10, bottom: 10),
-                              child: passwordField(),
-                            ),
-                            if (controller.signUp) confirmPasswordField(),
-                            toggleSignUpButton(),
-                            submitButton(),
-                            Padding(padding: EdgeInsets.all(20))
+                            if (controller.ultimoEmail != null)
+                              Column(
+                                children: [
+                                  Divider(),
+                                  emailField(),
+                                  if (controller.signUp)
+                                    Container(
+                                      margin: EdgeInsets.only(top: 10),
+                                      child: nomeField(),
+                                    ),
+                                  if (controller.signUp)
+                                    Container(
+                                      margin: EdgeInsets.only(top: 10),
+                                      child: cpfField(),
+                                    ),
+                                  if (controller.signUp)
+                                    Container(
+                                      margin: EdgeInsets.only(top: 10),
+                                      child: siapeField(),
+                                    ),
+                                  if (controller.signUp) selectCampus(),
+                                  Container(
+                                    margin:
+                                        EdgeInsets.only(top: 10, bottom: 10),
+                                    child: passwordField(),
+                                  ),
+                                  if (controller.signUp) confirmPasswordField(),
+                                  toggleSignUpButton(),
+                                  submitButton(),
+                                  Padding(padding: EdgeInsets.all(20))
+                                ],
+                              )
                           ],
                         ),
                       ),

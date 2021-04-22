@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:inventario_getx/components/localidades_page/localidades_repository.dart';
+import 'package:inventario_getx/data/model/correcao.dart';
 import 'package:inventario_getx/data/model/localidade.dart';
 import 'package:inventario_getx/routes/app_routes.dart';
 
@@ -11,7 +12,11 @@ class LocalidadesController extends GetxController {
   List<Localidade> localidadesFiltradas = [];
   TextEditingController searchController = TextEditingController();
   FocusNode searchFocus = FocusNode();
+  RxList<Correcao> _correcoes = RxList();
+
+  List<Correcao> get correcoes => _correcoes.toList();
   LocalidadesController() {
+    _correcoes.bindStream(repository.streamCorrecoes());
     localidadesFiltradas = localidades = Get.arguments['localidades'];
     print('Localidades: $localidades');
   }
@@ -41,8 +46,18 @@ class LocalidadesController extends GetxController {
     Get.offAllNamed(Routes.INITIAL);
   }
 
+  goToCorrecoes() {
+    Get.toNamed(Routes.CORRECOES);
+  }
+
   goToLocalidade(Localidade localidade) {
     Get.toNamed(Routes.LOCALIDADE_DETAIL,
         arguments: {'localidade': localidade});
+  }
+
+  Future<void> updateLocalidades() async {
+    localidadesFiltradas = localidades = await repository.getLocalidades();
+    print('localidades: $localidades');
+    update();
   }
 }

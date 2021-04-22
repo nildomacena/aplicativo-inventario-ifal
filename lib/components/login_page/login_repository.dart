@@ -37,6 +37,10 @@ class LoginRepository {
         nome: nome);
   }
 
+  Future<String> getUltimoEmail() {
+    return authProvider.getUltimoEmail();
+  }
+
   Future<List<Localidade>> getLocalidadesByUsuario(Usuario usuario) {
     return firestoreProvider.getLocalidadesPorUsuario(usuario);
   }

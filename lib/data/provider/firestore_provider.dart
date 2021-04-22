@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:inventario_getx/data/model/bem.dart';
 import 'package:inventario_getx/data/model/campus.dart';
+import 'package:inventario_getx/data/model/correcao.dart';
 import 'package:inventario_getx/data/model/localidade.dart';
 import 'package:inventario_getx/data/model/usuario.dart';
 import 'package:inventario_getx/data/provider/auth_provider.dart';
@@ -20,6 +21,8 @@ class FirestoreProvider {
   AuthProvider authProvider = Get.find();
   List<Campus> campi = [];
 
+  FirestoreProvider() {}
+
   Future<List<Campus>> getCampi() async {
     if (campi.isNotEmpty) return campi;
     campi = (await _firestore.collection('campi').orderBy('nome').get())
@@ -29,7 +32,19 @@ class FirestoreProvider {
     return campi;
   }
 
-  Future<List<Localidade>> getLocalidadesPorUsuario(Usuario usuario) async {
+  Stream<List<Correcao>> streamCorrecoes() {
+    return _firestore
+        .collection(
+            'campi/${authProvider.usuario.campusId}/2020/2020/correcoes')
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((s) => Correcao.fromFirestore(s)).toList());
+  }
+
+  Future<List<Localidade>> getLocalidadesPorUsuario([Usuario usuario]) async {
+    if (usuario == null) {
+      usuario = authProvider.usuario;
+    }
     QuerySnapshot querySnapshot = await _firestore
         .collection('campi/${usuario.campusId}/2020/2020/localidades')
         .get();
@@ -244,14 +259,15 @@ class FirestoreProvider {
       @required bool bemParticular,
       @required bool indicaDesfazimento,
       @required String observacoes,
-      @required File imagem}) async {
+      @required File imagem,
+      Correcao correcao}) async {
     if (imagem != null) {
       TaskSnapshot taskSnapshot = await storage
           .ref()
           .child(bemAntigo.storagePath)
           .putFile(imagem)
           .whenComplete(() => null);
-      return _firestore.doc(bemAntigo.firestorePath).update({
+      await _firestore.doc(bemAntigo.firestorePath).update({
         'descricao': descricao,
         'patrimonio': patrimonio,
         'semEtiqueta': semEtiqueta,
@@ -263,7 +279,7 @@ class FirestoreProvider {
         'imagem': await taskSnapshot.ref.getDownloadURL()
       });
     } else {
-      return _firestore.doc(bemAntigo.firestorePath).update({
+      await _firestore.doc(bemAntigo.firestorePath).update({
         'descricao': descricao,
         'patrimonio': patrimonio,
         'semEtiqueta': semEtiqueta,
@@ -274,5 +290,27 @@ class FirestoreProvider {
         'observacoes': observacoes,
       });
     }
+    print('Correcao: ${correcao.pathFirestore}');
+
+    if (correcao != null) {
+      await _firestore.doc(correcao.pathFirestore).update(
+          {'corrigido': true, 'corrigidoEm': FieldValue.serverTimestamp()});
+    }
+
+    return;
+  }
+
+  Future<void> deletarBem(Bem bem) async {
+    return _firestore.doc(bem.firestorePath).delete();
+  }
+
+  Future<Bem> getBemById(
+      {@required String bemId, @required String localidadeId}) async {
+    print(
+        'campi/${authProvider.usuario.campusId}/2020/2020/localidades/$localidadeId/bens/$bemId');
+    return Bem.fromFirestore(await _firestore
+        .doc(
+            'campi/${authProvider.usuario.campusId}/2020/2020/localidades/$localidadeId/bens/$bemId')
+        .get());
   }
 }
