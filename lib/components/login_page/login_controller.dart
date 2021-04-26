@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:get/get.dart';
@@ -157,6 +158,49 @@ class LoginController extends GetxController {
     campusEscolhido = campusSelecionado;
     update();
     Get.back();
+  }
+
+  redefinirSenha() async {
+    if (emailController.text.isEmpty ||
+        !emailController.text.isEmail ||
+        !emailController.text.toLowerCase().contains('@ifal.edu.br')) {
+      utilService.snackBarErro(
+          mensagem: 'Digite um email institucional válido');
+      return;
+    }
+    bool confirma = await Get.dialog(AlertDialog(
+      title: Text('Confirmação'),
+      content:
+          Text('Deseja realmente enviar um email de recuperação de senha ?'),
+      actions: [
+        TextButton(
+          child: Text('Cancelar'),
+          onPressed: () {
+            Get.back();
+          },
+        ),
+        TextButton(
+          child: Text('Confirma'),
+          onPressed: () {
+            Get.back(result: true);
+          },
+        )
+      ],
+    ));
+    if (confirma == null || !confirma) {
+      return;
+    }
+    try {
+      await repository.redefinirSenha(emailController.text);
+      utilService.snackBar(
+          titulo: 'Email enviado',
+          mensagem: 'Acesse sua caixa de email para redefinir a senha');
+    } catch (e) {
+      utilService.snackBarErro(
+          titulo: 'Ocorreu um erro durante o processo',
+          mensagem:
+              'Tente novamente, caso o erro persista, entre em contato com o administrador do sistema');
+    }
   }
 
   onSubmit() async {

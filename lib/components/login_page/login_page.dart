@@ -63,6 +63,15 @@ class LoginPage extends StatelessWidget {
     });
   }
 
+  Widget esqueciSenhaBotao() {
+    return TextButton(
+      child: Text('Esqueci a senha'),
+      onPressed: () {
+        controller.redefinirSenha();
+      },
+    );
+  }
+
   Widget confirmPasswordField() {
     return GetBuilder<LoginController>(builder: (_) {
       return TextFormField(
@@ -258,6 +267,7 @@ class LoginPage extends StatelessWidget {
                                     child: passwordField(),
                                   ),
                                   if (controller.signUp) confirmPasswordField(),
+                                  if (!controller.signUp) esqueciSenhaBotao(),
                                   toggleSignUpButton(),
                                   submitButton(),
                                   Padding(padding: EdgeInsets.all(20))

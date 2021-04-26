@@ -48,4 +48,8 @@ class LoginRepository {
   Future<List<Campus>> getCampi() {
     return firestoreProvider.getCampi();
   }
+
+  Future<void> redefinirSenha(String email) {
+    return authProvider.redefinirSenha(email);
+  }
 }

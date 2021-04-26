@@ -90,4 +90,8 @@ class AuthProvider {
     if (!snapshot.exists) return null;
     return Usuario.fromFirestore(snapshot);
   }
+
+  Future<void> redefinirSenha(String email) {
+    return _auth.sendPasswordResetEmail(email: email);
+  }
 }
