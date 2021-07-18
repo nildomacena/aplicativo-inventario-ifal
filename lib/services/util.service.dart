@@ -12,9 +12,11 @@ import 'package:get/get.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:inventario_getx/data/model/descricaoBem.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:image_picker/image_picker.dart';
 
 class UtilService {
   List<DescricaoBem> listaDescricao = [];
+  ImagePicker picker = ImagePicker();
 
   initJson() async {
     String data = await rootBundle.loadString('assets/csvjson.json');
@@ -188,6 +190,16 @@ class UtilService {
     );
     await imageAux.delete();
     return image;
+  }
+
+  Future<File> getImagePicker() async {
+    final PickedFile pickedFile = await picker.getImage(
+      source: ImageSource.camera,
+      imageQuality: 50,
+      maxHeight: 1080,
+      maxWidth: 1080,
+    );
+    return File(pickedFile.path);
   }
 
   Future<File> getImageBkp() {

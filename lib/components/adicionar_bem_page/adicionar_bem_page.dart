@@ -270,7 +270,7 @@ class AdicionarBemPage extends StatelessWidget {
               controller.onChangeDesfazimento(!controller.indicaDesfazimento);
             },
             child: Text(
-              'Indica bem para indicaDesfazimento?',
+              'Indica bem para Desfazimento?',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16),
             ),
@@ -327,7 +327,8 @@ class AdicionarBemPage extends StatelessWidget {
                       child: Center(
                         child: ElevatedButton.icon(
                             onPressed: () {
-                              controller.getImageTeste();
+                              //controller.getImageTeste();
+                              controller.getImage();
                             },
                             icon: Icon(Icons.photo),
                             label: Text('Adicionar Imagem')),

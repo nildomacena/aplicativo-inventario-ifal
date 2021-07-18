@@ -34,6 +34,11 @@ class Localidade {
 
   String get pathFirestore => 'campi/$campusId/2020/2020/localidades/$id';
 
+  int get statusToOrder => status == Status.em_andamento
+      ? 0
+      : status == Status.nao_iniciado
+          ? 1
+          : 2;
   factory Localidade.fromFirestore(DocumentSnapshot snapshot, String campusId,
       {QuerySnapshot snapshotBens}) {
     dynamic data = snapshot.data();

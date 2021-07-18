@@ -1,15 +1,20 @@
 import 'dart:io';
+import 'dart:math';
 
-import 'package:camera_camera/camera_camera.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:flutter_beep/flutter_beep.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inventario_getx/components/adicionar_bem_page/adicionar_bem_repository.dart';
 import 'package:inventario_getx/data/model/localidade.dart';
 import 'package:inventario_getx/services/util.service.dart';
 import 'package:inventario_getx/custom_widgets/visualizar_imagem_page.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:vibration/vibration.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class AdicionarBemController extends GetxController {
   Localidade localidade;
@@ -34,11 +39,66 @@ class AdicionarBemController extends GetxController {
   String radioEstado;
 
   File imagem;
+  int patrimonioTeste = 100;
 
   final AdicionarBemRepository repository;
   AdicionarBemController({@required this.repository})
       : assert(repository != null) {
     localidade = Get.arguments['localidade'];
+    if (kDebugMode) {
+      loadBemTeste();
+    }
+  }
+
+  loadBemTeste() async {
+    patrimonioTeste++;
+    bemParticular = randomBoolean();
+    descricaoController.text = 'Descrição teste';
+    bemParticular = randomBoolean();
+    radioEstado = randomNumber() % 2 == 0
+        ? 'uso'
+        : randomNumber() % 3 == 0
+            ? 'ocioso'
+            : 'danificado';
+    imagem = await getImageFileFromAssets('imagem-teste.jpg');
+    indicaDesfazimento = randomNumber() % 4 == 0;
+    numeroSerieController.text = '';
+    observacoesController.text = 'Esse é um bem de teste';
+    patrimonioController.text = randomNumber(10000).toString();
+    semEtiqueta = randomNumber() % 4 == 0;
+    if (semEtiqueta) patrimonioController.text = '';
+    update();
+    /* Localidade teste = await repository.salvarBem(localidade,
+          bemParticular: bemParticular,
+          descricao: descricaoController.text,
+          estadoBem: radioEstado,
+          imagem: imagem,
+          indicaDesfazimento: indicaDesfazimento,
+          numeroSerie: numeroSerieController.text,
+          observacoes: observacoesController.text,
+          patrimonio: patrimonioController.text,
+          semEtiqueta: semEtiqueta);
+    } */
+  }
+
+  Future<File> getImageFileFromAssets(String path) async {
+    final byteData = await rootBundle.load('assets/$path');
+
+    final file = File('${(await getTemporaryDirectory()).path}/$path');
+    await file.writeAsBytes(byteData.buffer
+        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+
+    return file;
+  }
+
+  bool randomBoolean() {
+    var rng = new Random();
+    return rng.nextBool();
+  }
+
+  randomNumber([int max]) {
+    var rng = new Random();
+    return rng.nextInt(max ?? 10);
   }
 
   unFocusAll() {
@@ -55,9 +115,13 @@ class AdicionarBemController extends GetxController {
   }
 
   checkPatrimonio([String patrimonio]) async {
+    print(randomBoolean());
     Localidade localidade = await repository
         .verificaBemJaCadastrado(patrimonio ?? patrimonioController.text);
     if (localidade != null) {
+      FlutterBeep.beep(false);
+      Vibration.vibrate();
+
       Get.dialog(AlertDialog(
         title: Text('Bem Já inventariado'),
         content: Text(
@@ -66,6 +130,7 @@ class AdicionarBemController extends GetxController {
           TextButton(
             child: Text('OK'),
             onPressed: () {
+              patrimonioController.text = '';
               Get.back();
             },
           )
@@ -91,6 +156,10 @@ class AdicionarBemController extends GetxController {
     try {
       String qrCodePatrimonio = await FlutterBarcodeScanner.scanBarcode(
           "#ff6666", "Cancelar", false, ScanMode.DEFAULT);
+      FlutterBeep.beep();
+      if (await Vibration.hasVibrator()) {
+        Vibration.vibrate();
+      }
       if (qrCodePatrimonio != null &&
           qrCodePatrimonio != '' &&
           qrCodePatrimonio != '-1') {
@@ -183,7 +252,7 @@ class AdicionarBemController extends GetxController {
 
   getImage() async {
     try {
-      File onFile = await utilService.getImage();
+      File onFile = await utilService.getImagePicker();
       if (onFile != null)
         imagem = onFile;
       else
@@ -244,11 +313,12 @@ class AdicionarBemController extends GetxController {
           patrimonio: patrimonioController.text,
           semEtiqueta: semEtiqueta);
       if (Get.isDialogOpen) Get.back();
-      Get.back();
+      if (kDebugMode) {
+        loadBemTeste();
+        return;
+      }
+      Get.back(result: descricaoController.text);
       print('teste: $teste');
-      utilService.snackBar(
-          titulo: 'Cadastro salvo!',
-          mensagem: 'O bem ${descricaoController.text} foi salvo');
     } catch (e) {
       if (Get.isDialogOpen) Get.back();
       print('Erro durante o cadastro: $e');

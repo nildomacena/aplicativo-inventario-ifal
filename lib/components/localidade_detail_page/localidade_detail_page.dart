@@ -28,7 +28,58 @@ class LocalidadeDetailPage extends StatelessWidget {
         appBar: AppBar(
           title: Text(controller.localidade.nome),
         ),
-        body: GetX<LocalidadeDetailController>(builder: (_) {
+        body: GetBuilder<LocalidadeDetailController>(
+          builder: (_) {
+            return RefreshIndicator(
+              onRefresh: () async {
+                _.updateBens();
+              },
+              child: Container(
+                  child: ListView.builder(
+                      itemCount: _.bens == null ? 2 : _.bens.length + 2,
+                      itemBuilder: (context, index) {
+                        if (index == 0)
+                          return CardDadosGerais(controller: controller);
+                        if (index == 1) return botaoAdicionarBem();
+                        Bem bem = _.bens[index - 2];
+                        return Container(
+                          margin: EdgeInsets.only(top: 3, bottom: 3),
+                          decoration: BoxDecoration(
+                              border:
+                                  Border.all(color: Colors.black, width: .4)),
+                          height: 60,
+                          width: double.infinity,
+                          child: Material(
+                            elevation: 1,
+                            child: ListTile(
+                              title: TextButton(
+                                child: Text('${bem.descricaoFormatada}',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600)),
+                                onPressed: () {
+                                  controller.goToBem(bem);
+                                },
+                              ),
+                              /* 
+                            Removido para testes
+                            Text(
+                              '${bem.descricao} - ${bem.bemParticular ? 'Bem particular' : bem.semEtiqueta ? 'Sem etiqueta' : bem.patrimonio}',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w400),
+                            ), */
+                            ),
+                          ),
+                        );
+                      })),
+            );
+          },
+        ));
+
+    /* 
+    Modo usando streams
+    GetX<LocalidadeDetailController>(builder: (_) {
           return Container(
               child: ListView.builder(
                   itemCount: _.bens.length + 2,
@@ -66,6 +117,6 @@ class LocalidadeDetailPage extends StatelessWidget {
                       ),
                     );
                   }));
-        }));
+        })); */
   }
 }

@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:flutter_beep/flutter_beep.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:get/get.dart';
 import 'package:inventario_getx/components/login_page/custom_widgets/select_campus_modal.dart';
@@ -11,6 +13,7 @@ import 'package:inventario_getx/data/model/localidade.dart';
 import 'package:inventario_getx/data/model/usuario.dart';
 import 'package:inventario_getx/routes/app_routes.dart';
 import 'package:inventario_getx/services/util.service.dart';
+import 'package:vibration/vibration.dart';
 
 class LoginController extends GetxController {
   final LoginRepository repository;
@@ -50,6 +53,18 @@ class LoginController extends GetxController {
     campi = await repository.getCampi();
     getUltimoEmail();
     super.onInit();
+  }
+
+  //APENAS PARA TESTES
+  testarVibracao() async {
+    try {
+      String qrCodePatrimonio = await FlutterBarcodeScanner.scanBarcode(
+          "#ff6666", "Cancelar", false, ScanMode.DEFAULT);
+    } catch (e) {}
+    if (await Vibration.hasVibrator()) {
+      await FlutterBeep.beep();
+      await Vibration.vibrate();
+    }
   }
 
   getUltimoEmail() async {

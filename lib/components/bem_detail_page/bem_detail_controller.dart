@@ -319,7 +319,7 @@ class BemDetailController extends GetxController {
           semEtiqueta: semEtiqueta,
           correcao: correcao);
       if (Get.isDialogOpen) Get.back();
-      Get.back();
+      Get.back(result: true);
       utilService.snackBar(
           titulo: 'Cadastro salvo!',
           mensagem: 'O bem ${descricaoController.text} foi salvo');

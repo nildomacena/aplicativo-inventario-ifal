@@ -46,6 +46,11 @@ class Bem {
       return descricao;
   }
 
+  String get descricaoFormatada {
+    if (!bemParticular) return '$patrimonio - $descricao';
+    return descricao;
+  }
+
   String get dataCadastroFormatada {
     return '${dataCadastro.day}/${dataCadastro.month}/${dataCadastro.year} - ${dataCadastro.hour}:${dataCadastro.minute}';
   }

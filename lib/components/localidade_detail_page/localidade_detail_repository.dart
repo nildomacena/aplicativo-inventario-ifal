@@ -13,4 +13,8 @@ class LocalidadeDetailRepository {
   Stream<List<Bem>> streamBensPorLocalidade(Localidade localidade) {
     return firestoreProvider.streamBensPorLocalidade(localidade);
   }
+
+  Future<List<Bem>> getBensPorLocalidade(Localidade localidade) {
+    return firestoreProvider.getBensPorLocalidade(localidade);
+  }
 }

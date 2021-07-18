@@ -27,11 +27,31 @@ class LocalidadesPage extends StatelessWidget {
         init: LocalidadesController(),
         builder: (_) {
           return RefreshIndicator(
+            key: controller.refreshIndicatorKey,
             onRefresh: controller.updateLocalidades,
             child: Container(
               child: ListView.builder(
                   itemCount: controller.localidadesFiltradas.length + 1,
                   itemBuilder: (BuildContext context, int index) {
+                    if (controller.localidades.isEmpty)
+                      return Container(
+                          margin: EdgeInsets.only(top: 25),
+                          child: Column(
+                            children: [
+                              Text(
+                                  'Não há localidades cadastradas.\nEntre em contato com o Administrador',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 20)),
+                              Container(
+                                margin: EdgeInsets.only(top: 20),
+                                child: ElevatedButton(
+                                    onPressed: () {
+                                      controller.updateRefreshIndicator();
+                                    },
+                                    child: Text('ATUALIZAR')),
+                              )
+                            ],
+                          ));
                     if (index == 0)
                       return Container(
                         margin: EdgeInsets.only(

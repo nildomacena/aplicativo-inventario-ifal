@@ -271,7 +271,7 @@ class BemDetailPage extends StatelessWidget {
               controller.onChangeDesfazimento(!controller.indicaDesfazimento);
             },
             child: Text(
-              'Indica bem para indicaDesfazimento?',
+              'Indica bem para Desfazimento?',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16),
             ),

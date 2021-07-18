@@ -211,26 +211,31 @@ class LoginPage extends StatelessWidget {
                             Container(
                               padding: EdgeInsets.all(15),
                             ),
-                            Container(
-                              child: Text(
-                                'INVENTÁRIO IFAL',
-                                style: TextStyle(
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.bold,
-                                    shadows: <Shadow>[
-                                      Shadow(
-                                        offset: Offset(1.0, 1.0),
-                                        blurRadius: 2.0,
-                                        color: Color.fromARGB(255, 0, 0, 0),
-                                      ),
-                                      Shadow(
-                                        offset: Offset(1, 1),
-                                        blurRadius: 1.0,
-                                        color: Color.fromARGB(125, 0, 0, 255),
-                                      ),
-                                    ],
-                                    color: Get.theme.primaryColor),
-                                textAlign: TextAlign.center,
+                            GestureDetector(
+                              onLongPress: () {
+                                controller.testarVibracao();
+                              },
+                              child: Container(
+                                child: Text(
+                                  'INVENTÁRIO IFAL',
+                                  style: TextStyle(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.bold,
+                                      shadows: <Shadow>[
+                                        Shadow(
+                                          offset: Offset(1.0, 1.0),
+                                          blurRadius: 2.0,
+                                          color: Color.fromARGB(255, 0, 0, 0),
+                                        ),
+                                        Shadow(
+                                          offset: Offset(1, 1),
+                                          blurRadius: 1.0,
+                                          color: Color.fromARGB(125, 0, 0, 255),
+                                        ),
+                                      ],
+                                      color: Get.theme.primaryColor),
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
                             ),
                             if (controller.ultimoEmail == null)

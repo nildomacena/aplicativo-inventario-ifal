@@ -32,7 +32,7 @@ class CardDadosGerais extends StatelessWidget {
               Container(
                 margin: EdgeInsets.only(top: 5, bottom: 2),
                 child: Text(
-                  'Bens cadastrados: ${_.bens.length}',
+                  'Bens cadastrados: ${_.bens == null ? 'Carregando...' : _.bens.length}',
                   style: textStyleDados,
                 ),
               ),

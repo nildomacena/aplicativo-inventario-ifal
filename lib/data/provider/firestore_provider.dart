@@ -48,6 +48,7 @@ class FirestoreProvider {
     QuerySnapshot querySnapshot = await _firestore
         .collection('campi/${usuario.campusId}/2020/2020/localidades')
         .get();
+
     List<Localidade> localidades = querySnapshot.docs
         .map((s) => Localidade.fromFirestore(
               s,
@@ -78,6 +79,18 @@ class FirestoreProvider {
         .snapshots()
         .map((snapshot) =>
             snapshot.docs.map((s) => Bem.fromFirestore(s)).toList());
+  }
+
+  Future<List<Bem>> getBensPorLocalidade(Localidade localidade) async {
+    QuerySnapshot snapshot =
+        await _firestore.doc(localidade.pathFirestore).collection('bens').get();
+    return snapshot.docs.map((s) => Bem.fromFirestore(s)).toList();
+    /* return _firestore
+        .doc(localidade.pathFirestore)
+        .collection('bens')
+        .get()
+        .map((snapshot) =>
+            snapshot.docs.map((s) => Bem.fromFirestore(s)).toList()); */
   }
 
   Future<dynamic> salvarImagensPanoramicas(
@@ -180,6 +193,7 @@ class FirestoreProvider {
   }
 
   Future<Localidade> verificaBemJaCadastrado(String patrimonio) async {
+    authProvider.usuario.campusId;
     QuerySnapshot snapshot = await _firestore
         .collection('campi/${authProvider.usuario.campusId}/2020/2020/bens')
         .where('patrimonio', isEqualTo: patrimonio)
@@ -290,9 +304,9 @@ class FirestoreProvider {
         'observacoes': observacoes,
       });
     }
-    print('Correcao: ${correcao.pathFirestore}');
 
     if (correcao != null) {
+      print('Correcao: ${correcao.pathFirestore}');
       await _firestore.doc(correcao.pathFirestore).update(
           {'corrigido': true, 'corrigidoEm': FieldValue.serverTimestamp()});
     }
@@ -301,6 +315,9 @@ class FirestoreProvider {
   }
 
   Future<void> deletarBem(Bem bem) async {
+    await _firestore
+        .doc('campi/${bem.campusId}/2020/2020/bens/${bem.id}')
+        .delete();
     return _firestore.doc(bem.firestorePath).delete();
   }
 
